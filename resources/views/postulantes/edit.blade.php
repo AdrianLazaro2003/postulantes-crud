@@ -28,7 +28,7 @@
             <div class="mb-3 row">
                 <label for="tipo" class="col-sm-2 col-form-label">Tipo Documento:</label>
                 <div class="col-sm-5">
-                    <select name="tipo" id="tipo" class="form-select" required>
+                    <select name="tipo" id="tipo" class="form-select" required disabled>
                         <option value="">Seleccionar tipo de documento</option>
                         @foreach($tipos as $tipo)
                         <option value="{{ $tipo->id }}" @if ($tipo->id == $postulante->tipo_documento_id) {{'selected'}} @endif>{{ $tipo->documento }}</option>

@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\FormularioPostulacionController;
 use App\Http\Controllers\PostulanteController;
 use Illuminate\Support\Facades\Route;
 
@@ -19,3 +20,4 @@ Route::get('/', function () {
 });
 
 Route::resource('postulantes', PostulanteController::class);
+Route::resource('formulario_postulaciones', FormularioPostulacionController::class);

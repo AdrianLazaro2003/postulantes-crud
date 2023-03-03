@@ -1,9 +1,13 @@
 <?php
 
+
 namespace App\Http\Controllers;
+
+use App\Models\FormularioPostulacion;
 use App\Models\Postulante;
 use App\Models\TipoDocumento;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class PostulanteController extends Controller
 {
@@ -12,10 +16,14 @@ class PostulanteController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        $postulantes = Postulante::all();
-        return view('postulantes.index', ['postulantes' => $postulantes]);
+        $busqueda = $request->busqueda;
+        $postulantes = Postulante::where('numero_documento','LIKE','%'.$busqueda.'%')
+                ->latest('id')
+                ->paginate(7);
+
+        return view('postulantes.index', ['postulantes' => $postulantes], ['busqueda' => $busqueda]);
     }
 
     /**
@@ -54,6 +62,11 @@ class PostulanteController extends Controller
         $postulantes->email = $request->input('email');
         $postulantes->save();
 
+        $formulario = new FormularioPostulacion();
+        $formulario->postulante_id= $postulantes->id;
+        $formulario->documento_id= $postulantes->tipo_documento_id;
+        $formulario->save();
+
         return view('postulantes.message',['msg'=>'Registro guardado']);
     }
 
@@ -90,7 +103,6 @@ class PostulanteController extends Controller
     public function update(Request $request, $id)
     {
         $request->validate([  
-            'tipo' => 'required',
             'numero_documento' => 'required|max:10|unique:postulantes,numero_documento,' . $id,
             'nombre' => 'required|max:255',
             'fecha' => 'required|date',
@@ -99,13 +111,17 @@ class PostulanteController extends Controller
         ]);
 
         $postulantes = Postulante::find($id);
-        $postulantes->tipo_documento_id = $request->input('tipo');
         $postulantes->numero_documento = $request->input('numero_documento');
         $postulantes->nombre = $request->input('nombre');
         $postulantes->fecha_nacimiento = $request->input('fecha');
         $postulantes->telefono = $request->input('telefono');
         $postulantes->email = $request->input('email');
         $postulantes->save();
+
+        $formulario = new FormularioPostulacion();
+        $formulario->postulante_id= $postulantes->id;
+        $formulario->documento_id= $postulantes->tipo_documento_id;
+        $formulario->save();
 
         return view('postulantes.message',['msg'=>'Registro modificado']);
     }
@@ -119,6 +135,7 @@ class PostulanteController extends Controller
     public function destroy($id)
     {
         $postulante = Postulante::find($id);
+        $formulario = FormularioPostulacion::where('documento_id', $postulante->id)->delete();
         $postulante->delete();
 
         return redirect("postulantes");

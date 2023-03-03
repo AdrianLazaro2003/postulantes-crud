@@ -13,4 +13,8 @@ class Postulante extends Model
         return $this->belongsTo(TipoDocumento::class, 'tipo_documento_id','id');
     }
 
+    public function formularios_postulacion(){
+        return $this->hasMany(FormularioPostulacion::class, 'postulante_id');
+    }
+
 }
